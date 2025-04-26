@@ -1,0 +1,163 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="/static/css/tailwind.local.css" rel="stylesheet">
+<!--    <style>-->
+<!--        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');-->
+<!--        body {-->
+<!--            font-family: 'Inter', sans-serif;-->
+<!--        }-->
+<!--    </style>-->
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script src="/static/js/snap.svg.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-8">
+        <div class="flex flex-col md:flex-row md:space-x-6">
+            <div class="w-full md:w-1/4 bg-white p-4 shadow-md">
+                <div class="mb-4">
+                    <p class="text-gray-700 font-semibold">Wei Zhang's Workspace</p>
+                    <p class="text-xs text-gray-500">Free Plan</p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-gray-700 font-semibold">Class</p>
+                    <ul class="text-sm">
+                        <li class="text-gray-600 my-2">Query Tool <div id = "my-test-rest-api"></div></li>
+                        <li class="text-gray-600 my-2">Saved Queries</li>
+                        <li class="text-gray-600 my-2">Datasets</li>
+                        <li class="text-gray-600 my-2">Data Requests</li>
+                        <li class="text-gray-600 my-2">Lists</li>
+                        <li class="text-gray-600 my-2">Pipelines</li>
+                        <li class="text-gray-600 my-2">Followed Topics</li>
+                    </ul>
+                </div>
+                <div class="mb-4">
+                    <p class="text-gray-700 font-semibold">Relationship</p>
+                </div>
+                <div class="mb-4">
+                    <ul class="text-sm">
+                        <li class="text-gray-600 my-2">Invite Members</li>
+                        <li class="text-gray-600 my-2">Workspace Settings</li>
+                        <li class="text-gray-600 my-2">Upgrade Workspace</li>
+                        <li class="cursor-zoom-in text-gray-600 my-2">API Access</li>
+                        <li class="cursor-crosshair text-gray-600 my-2">Pricing</li>
+                        <li class="cursor-wait text-gray-600 my-2">Help & Support</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="w-full md:w-3/4 bg-white p-4 shadow-md">
+                <div class="mb-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button class="bg-blue-100 text-gray-600 px-4 py-2" onclick="toggleColor(this)">Financial Ontology</button>
+                            <button class="bg-blue-100 text-gray-600 px-4 py-2 " onclick="toggleColor(this)">Medical Ontology</button>
+                            <button class="bg-blue-100 text-gray-600 px-4 py-2 " onclick="toggleColor(this)">Technology Ontology</button>
+                            <button class="bg-blue-100 text-gray-600 px-4 py-2 " onclick="toggleColor(this)">Show More (...)</button>
+                        </div>
+                        <div>
+                            <button class="text-gray-600 px-4 py-2"><i class="fas fa-cog"></i></button>
+                            <button class="bg-blue-500 text-white px-4 py-2 rounded">Create</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-center justify-between bg-gray-200 p-4 rounded">
+                        <div class="mb-4 md:mb-0">
+                            <label class="text-black">Entities</label>
+                            <select class="ml-2 border border-gray-300 rounded px-2 py-1">
+                                <option>Company</option>
+                            </select>
+                        </div>
+                        <div class="mb-4 md:mb-0">
+                            <label class="text-gray-600">WHERE</label>
+                            <select class="ml-2 border border-gray-300 rounded px-2 py-1">
+                                <option>Industry</option>
+                            </select>
+                            <select class="ml-2 border border-gray-300 rounded px-2 py-1">
+                                <option>is</option>
+                            </select>
+                            <input type="text" placeholder="Search for Industry" class="ml-2 border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <button class="text-blue-500 px-4 py-2">Search</button>
+                            <button class="text-gray-600 px-4 py-2">Clear filters</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <div>
+                            <button class="text-gray-600 px-2 py-1" hx-get="/static/snap-move.svg" hx-target="#my-person-content" hx-trigger="click"><i class="fas fa-plus"></i> Add Columns</button>
+                            <button class="text-gray-600 px-2 py-1" hx-get="/items/1" hx-target="#samsung-api-content-1" hx-trigger="click"><i class="fas fa-bell"></i> Set Alert</button>
+                            <button class="text-gray-600 px-2 py-1"><i class="fas fa-file-export"></i> Export</button>
+                            <button class="text-gray-600 px-2 py-1"><i class="fas fa-code"></i> Access by API</button>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Search" class="border border-gray-300 rounded px-2 py-1">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-200 text-left text-gray-600">
+                                    <th class="px-4 py-2">Name</th>
+                                    <th class="px-4 py-2">Description</th>
+                                    <th class="px-4 py-2">Industry</th>
+                                    <th class="px-4 py-2">Official Website</th>
+                                    <th class="px-4 py-2">Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2"><div id = "samsung-api-content-2"></div></td>
+                                    <td class="px-4 py-2"><div id = "samsung-api-content-1"></div></td>
+                                    <td class="px-4 py-2">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">5G</span>
+                                        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">Nanotechnology</span>
+                                        <span class="bg-purple-100 text-purple-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-purple-200 dark:text-purple-900">Manufacturing</span>
+                                    </td>
+                                    <td class="px-4 py-2">samsung.com</td>
+                                    <td class="px-4 py-2">Samsung Town, South Korea</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2">Microsoft</td>
+                                    <td class="px-4 py-2">Microsoft is an American multinational technology company that develops,</td>
+                                    <td class="px-4 py-2">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">Software development</span>
+                                        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">Business intelligence (BI)</span>
+                                        <span class="bg-purple-100 text-purple-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-purple-200 dark:text-purple-900">Risk management</span>
+                                    </td>
+                                    <td class="px-4 py-2">microsoft.com</td>
+                                    <td class="px-4 py-2">Redmond, Washington, Washington (state)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <div id="my-person-content">
+                                    </div>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleColor(button) {
+            button.classList.toggle("bg-blue-500"); // Adds or removes blue background
+            button.classList.toggle("bg-blue-100"); // Toggles between gray and blue
+            button.classList.toggle("rounded");
+            button.classList.toggle("text-gray-600");
+            button.classList.toggle("text-white");
+        }
+
+        fetch('/items/2')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("samsung-api-content-2").innerText =JSON.stringify(data);
+        })
+        .catch(error => console.error("Error loading model:", error));
+    </script>
+</body>
+</html>
