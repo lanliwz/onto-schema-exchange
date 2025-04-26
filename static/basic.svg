@@ -1,0 +1,37 @@
+
+<svg id="svgout" width="400" height="300" xmlns="http://www.w3.org/2000/svg" class="stroke-1 stroke-gray-700 fill-cyan-500">
+  <!-- Group for the Teacher class -->
+  <g id="my-g1" class="hover:stroke-2 text-lg">
+    <rect x="10" y="10" width="180" height="100" fill="none" class="hover:cursor-move"/>
+    <text x="20" y="30">Teacher</text>
+    <line x1="10" y1="32" x2="190" y2="32"/>
+    <g class="text-sm">
+      <text x="20" y="50">id: int</text>
+      <text x="20" y="65">name: string</text>
+      <text x="20" y="80">subject: string</text>
+    </g>
+  </g>
+
+  <!-- Group for the Student class -->
+  <g id="my-g2">
+    <rect x="210" y="10" width="180" height="160" fill="none" stroke="black"/>
+    <text x="220" y="30" font-size="16" font-family="Arial" font-weight="bold">Student</text>
+    <line x1="210" y1="40" x2="390" y2="40" stroke="black" stroke-width="2"/>
+    <text x="220" y="60" font-size="12" font-family="Arial">name: string</text>
+    <text x="220" y="75" font-size="12" font-family="Arial">age: int</text>
+    <text x="220" y="90" font-size="12" font-family="Arial">sex: string</text>
+    <text x="220" y="105" font-size="12" font-family="Arial">grade: string</text>
+  </g>
+
+  <!-- Line representing "teach" relationship -->
+  <line id="my-l1" x1="190" y1="60" x2="198" y2="60" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <text x="150" y="55" font-size="12" font-family="Arial">teach</text>
+
+  <!-- Arrowhead definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+    refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black"/>
+    </marker>
+  </defs>
+</svg>

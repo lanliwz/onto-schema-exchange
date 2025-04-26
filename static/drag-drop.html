@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <link rel="stylesheet" href="/static/css/tailwind.local.css"></link>
+</head>
+<body>
+
+    <div class="flex items-center justify-center h-screen bg-gray-100">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h1 class="text-lg font-semibold mb-4">Upload a File</h1>
+            <div id="drop-area" class="flex flex-col items-center p-4 border-2 border-dashed rounded-lg mb-4">
+                <i class="fas fa-cloud-upload-alt fa-3x text-gray-300 mb-2"></i>
+                <p class="text-sm text-gray-500">Upload a file or drag and drop here</p>
+                <p class="text-xs text-gray-500">(.json)</p>
+            </div>
+            <div class="mb-4">
+                <input type="text" placeholder="Name" class="w-full p-2 border rounded-lg">
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancel</button>
+                <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Upload</button>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/drag-drop-files.js"></script>
+</body>
+</html>
