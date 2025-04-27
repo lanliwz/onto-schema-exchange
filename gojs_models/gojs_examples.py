@@ -1,4 +1,6 @@
-from gojs_models.gojs_er_init import *
+
+
+from gojs_models.er.gojs_er_init import *
 
 
 print(init())

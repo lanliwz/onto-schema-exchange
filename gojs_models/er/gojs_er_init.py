@@ -1,11 +1,10 @@
-from pydantic import BaseModel, Field
-from typing import List, Dict, Any
+from typing import Dict, Any
 
-from gojs_models.gojs_er_theme_manager import *
-from gojs_models.gogs_er_node_template import NodeTemplate
-from gojs_models.gojs_er_item_template import ItemTemplate
-from gojs_models.gojs_er_link_template import LinkTemplate
-from gojs_models.gojs_er_data_model import *
+from gojs_models.er.gojs_er_theme_manager import *
+from gojs_models.er.gogs_er_node_template import NodeTemplate
+from gojs_models.er.gojs_er_item_template import ItemTemplate
+from gojs_models.er.gojs_er_link_template import LinkTemplate
+from gojs_models.er.gojs_er_data_model import *
 
 
 class ForceDirectedLayout(BaseModel):
