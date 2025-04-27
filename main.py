@@ -23,7 +23,8 @@ from fastapi.responses import HTMLResponse
 templates = Jinja2Templates(directory='templates')
 @app.get("/", response_class=HTMLResponse)
 async def get_home(request: Request):
-    return templates.TemplateResponse(name="myEntityRelationship.html", context={'request':request})
+    # myEntityRelationship
+    return templates.TemplateResponse(name="myfamilyTree.html", context={'request':request})
 
 # templates
 @app.get("/myitems/{id}", response_class=HTMLResponse)

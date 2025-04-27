@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"/>
+
+<meta name="description" content="A family tree diagram of British nobility." />
+<meta itemprop="description" content="A family tree diagram of British nobility." />
+
+
+    <title>
+      Family Tree Diagram of British Nobility | GoJS Diagramming Library
+    </title>
+  </head>
+
+  <body>
+    <!-- This top nav is not part of the sample code -->
+    <div class="flex flex-col prose">
+      <div class="w-full max-w-screen-xl mx-auto">
+        <!-- * * * * * * * * * * * * * -->
+        <!-- Start of GoJS sample code -->
+        <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.15"></script>
+        <script id="model_data" src="/model/ft_model_data.js"></script>
+        <script id="model_template" src="/model/ft_model_template.js"></script>
+        
+
+        <div id="allSampleContent" class="p-4 w-full">
+          
+            
+            
+
+
+        <link href="https://fonts.googleapis.com/css?family=Poppins:regular,medium,bold&subset=latin,latin-ext" rel="stylesheet"
+          type="text/css">
+        <script id="code">
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // setTimeout only to ensure font is loaded before loading diagram
+    // you may want to use an asset loading library for this
+    // to keep this sample simple, it does not
+    setTimeout(() => {
+      initDiagram('myDiagramDiv');
+    }, 300);
+  });
+        </script>
+
+        <div id="sample">
+          <div id="myDiagramDiv" style="background-color: white; border: solid 1px black; width: 100%; height: 550px"></div>
+          <p><button id="zoomToFit">Zoom to Fit</button> <button id="centerRoot">Center on root</button></p>
+        </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -86,27 +86,31 @@ class PersonCounter(BaseModel):
     );"""
 
 class PictureStyle(BaseModel):
+    image_folder: str = '/static/js/gojs-kit/samples/images/'
+
     def to_javascript(self) -> str:
-        return """function pictureStyle(pic) {
+        return f"""function pictureStyle(pic) {{
   return pic
-    .bind('source', '', ({ status, gender }) => {
-      switch (status) {
+    .bind('source', '', ({{
+      status, gender
+    }}) => {{
+      switch (status) {{
         case 'king':
         case 'queen':
-          return './images/king.svg';
+          return '{self.image_folder}king.svg';
         case 'prince':
         case 'princess':
-          return './images/prince.svg';
+          return '{self.image_folder}prince.svg';
         case 'civilian':
           return gender === 'M'
-            ? './images/male-civilian.svg'
-            : './images/female-civilian.svg';
+            ? '{self.image_folder}male-civilian.svg'
+            : '{self.image_folder}female-civilian.svg';
         default:
-          return './images/male-civilian.svg';
-      }
-    })
-    .bind('desiredSize', 'status', status => {
-      switch (status) {
+          return '{self.image_folder}male-civilian.svg';
+      }}
+    }})
+    .bind('desiredSize', 'status', status => {{
+      switch (status) {{
         case 'king':
         case 'queen':
           return new go.Size(30, 20);
@@ -116,9 +120,9 @@ class PictureStyle(BaseModel):
         case 'civilian':
         default:
           return new go.Size(24, 24);
-      }
-    });
-}"""
+      }}
+    }});
+}}"""
 
 class PersonImage(BaseModel):
     alignmentFocus: str = 'Top'
