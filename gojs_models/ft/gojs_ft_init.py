@@ -6,7 +6,7 @@ from gojs_models.ft.gojs_ft_theme_manager import *
 def init():
 
     handlers = PartEventHandlers()
-    bindings = BindingComponents()
+    # bindings = BindingComponents()
     templates = TemplateComponents()
     person_shapes = PersonShapeComponents()
     return (
