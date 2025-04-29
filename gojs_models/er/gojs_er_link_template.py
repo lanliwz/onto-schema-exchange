@@ -23,8 +23,6 @@ class LinkTemplate(BaseModel):
     routing: str = 'go.Routing.AvoidsNodes'
     corner: int = 5
     curve: str = 'go.Curve.JumpOver'
-
-
     shape: LinkShape = LinkShape()
     from_label: Optional[TextBlock] = TextBlock(segmentIndex=0, textBinding='text')
     to_label: Optional[TextBlock] = TextBlock(segmentIndex=-1, textBinding='toText')
