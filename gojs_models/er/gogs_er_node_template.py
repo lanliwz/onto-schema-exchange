@@ -3,7 +3,8 @@ from typing import Literal, Optional
 
 
 class NodeShape(BaseModel):
-    figure: str = 'RoundedRectangle'
+    # https://gojs.net/latest/samples/shapes.html
+    figure: str = 'document'
     stroke: constr(pattern=r'^#[0-9a-fA-F]{6}$') = '#e8f1ff'
     strokeWidth: int = 3
     fillTheme: str = 'primary'

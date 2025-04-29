@@ -2,6 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, constr
 
 class LinkShape(BaseModel):
+    # https://gojs.net/latest/samples/arrowheads.html
     stroke: constr(pattern=r'^#[0-9a-fA-F]{6}$') = '#f7f9fc'
     strokeWidth: int = 2
     fromArrow: str = 'Chevron'
