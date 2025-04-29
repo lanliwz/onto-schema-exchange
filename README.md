@@ -47,7 +47,6 @@ FastAPI Tutorial - User Guide (https://fastapi.tiangolo.com/tutorial/)
 
 ```
 http://127.0.0.1:8000/docs
-http://127.0.0.1:8000/items/1234
 ```
 
 ## Install Tailwindcss
@@ -64,6 +63,13 @@ npx tailwindcss init
 npm install gojs
 npm create gojs-kit@latest
 ```
+
+## This project provides interactive diagrams for better visualization.
+- [Entity-Relationship Diagram](http://127.0.0.1:8000/static/my-er-diagram.html)
+- [Family Tree Diagram](http://127.0.0.1:8000/static/my-family-tree.html)
+
+Make sure your server is running locally at `http://127.0.0.1:8000` to view them.
+
 ### run sample
 ```
 https://gojs.net/latest/intro/
@@ -77,8 +83,6 @@ http://127.0.0.1:8000/static/js/gojs-kit/samples/dataFlow.html
 http://127.0.0.1:8000/static/js/gojs-kit/samples/dataVisualization.html
 
 http://127.0.0.1:8000/static/js/gojs-kit/samples/Dimensioning.html
-
-http://127.0.0.1:8000/static/js/gojs-kit/samples/myEntityRelationship.html
 
 http://127.0.0.1:8000/static/js/gojs-kit/samples/umlClass.html
 

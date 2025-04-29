@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory='templates')
 @app.get("/", response_class=HTMLResponse)
 async def get_home(request: Request):
     # myEntityRelationship
-    return templates.TemplateResponse(name="myfamilyTree.html", context={'request':request})
+    return templates.TemplateResponse(name="index.html", context={'request':request})
 
 # templates
 @app.get("/myitems/{id}", response_class=HTMLResponse)
