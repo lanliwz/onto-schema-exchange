@@ -3,7 +3,7 @@ from pydantic import BaseModel, constr
 
 class LinkShape(BaseModel):
     stroke: constr(pattern=r'^#[0-9a-fA-F]{6}$') = '#f7f9fc'
-    strokeWidth: int = 3
+    strokeWidth: int = 2
     fromArrow: str = 'Chevron'
     toArrow: str = 'Standard'
 
