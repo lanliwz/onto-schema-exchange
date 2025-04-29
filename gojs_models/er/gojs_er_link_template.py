@@ -4,6 +4,8 @@ from pydantic import BaseModel, constr
 class LinkShape(BaseModel):
     stroke: constr(pattern=r'^#[0-9a-fA-F]{6}$') = '#f7f9fc'
     strokeWidth: int = 3
+    fromArrow: str = 'Chevron'
+    toArrow: str = 'Standard'
 
 class TextBlock(BaseModel):
     textAlign: str = 'center'
@@ -22,6 +24,7 @@ class LinkTemplate(BaseModel):
     corner: int = 5
     curve: str = 'go.Curve.JumpOver'
 
+
     shape: LinkShape = LinkShape()
     from_label: Optional[TextBlock] = TextBlock(segmentIndex=0, textBinding='text')
     to_label: Optional[TextBlock] = TextBlock(segmentIndex=-1, textBinding='toText')
@@ -39,6 +42,16 @@ class LinkTemplate(BaseModel):
     new go.Shape({{
       stroke: '{self.shape.stroke}',
       strokeWidth: {self.shape.strokeWidth}
+    }}).theme('stroke', 'link'),
+    new go.Shape({{
+      stroke: '{self.shape.stroke}',
+      strokeWidth: {self.shape.strokeWidth},
+      fromArrow: '{self.shape.fromArrow}'
+    }}).theme('stroke', 'link'),
+        new go.Shape({{
+      stroke: '{self.shape.stroke}',
+      strokeWidth: {self.shape.strokeWidth},
+      toArrow: '{self.shape.toArrow}'
     }}).theme('stroke', 'link'),
     new go.TextBlock({{
       textAlign: '{self.from_label.textAlign}',
