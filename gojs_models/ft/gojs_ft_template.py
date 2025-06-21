@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class CreateNodeTemplate(BaseModel):
+class NodeTemplate(BaseModel):
     def to_javascript(self) -> str:
         return """const createNodeTemplate = () =>
   new go.Node('Spot', {
@@ -21,7 +21,7 @@ class CreateNodeTemplate(BaseModel):
       personCounter()
     );"""
 
-class CreateLinkTemplate(BaseModel):
+class LinkTemplate(BaseModel):
     def to_javascript(self) -> str:
         return """const createLinkTemplate = () =>
   new go.Link({
@@ -86,8 +86,8 @@ class InitDiagram(BaseModel):
 }};"""
 
 class TemplateComponents(BaseModel):
-    create_node_template: CreateNodeTemplate = CreateNodeTemplate()
-    create_link_template: CreateLinkTemplate = CreateLinkTemplate()
+    create_node_template: NodeTemplate = NodeTemplate()
+    create_link_template: LinkTemplate = LinkTemplate()
     init_diagram: InitDiagram = InitDiagram()
 
     def to_javascript(self) -> str:
