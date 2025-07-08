@@ -73,17 +73,13 @@ Make sure your server is running locally at `http://127.0.0.1:8000` to view them
 ### run sample
 ```
 https://gojs.net/latest/intro/
-
 http://127.0.0.1:8000/static/js/gojs-kit/samples/absolute.html
-
 http://127.0.0.1:8000/static/js/gojs-kit/samples/addRemoveColumns.html
-
 http://127.0.0.1:8000/static/js/gojs-kit/samples/dataFlow.html
-
+http://127.0.0.1:8000/static/js/gojs-kit/samples/processFlow.html
 http://127.0.0.1:8000/static/js/gojs-kit/samples/dataVisualization.html
-
 http://127.0.0.1:8000/static/js/gojs-kit/samples/Dimensioning.html
-
 http://127.0.0.1:8000/static/js/gojs-kit/samples/umlClass.html
+http://127.0.0.1:8000/static/js/gojs-kit/samples/stateChart.html
 
 ```
