@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 class NodeShape(BaseModel):
     # https://gojs.net/latest/samples/shapes.html
-    figure: str = 'document'
+    figure: str = 'rectangle'
     stroke: constr(pattern=r'^#[0-9a-fA-F]{6}$') = '#e8f1ff'
     strokeWidth: int = 3
     fillTheme: str = 'primary'

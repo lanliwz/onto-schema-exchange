@@ -230,38 +230,36 @@
       Diagram Model saved in JSON format:
     </div>
     <textarea id="mySavedModel" style="width: 100%; height: 300px">
-{ "class": "go.GraphLinksModel",
+{ "class": "GraphLinksModel",
   "nodeKeyProperty": "id",
   "pointsDigits": 0,
   "nodeDataArray": [
-  {"id":-1, "loc":"155 -150", "type":"Start", "text":"Start" },
-  {"id":0, "loc":"190 15", "text":"Shopping"},
-  {"id":1, "loc":"353 32", "text":"Browse Items"},
-  {"id":2, "loc":"353 166", "text":"Search Items"},
-  {"id":3, "loc":"552 12", "text":"View Item"},
-  {"id":4, "loc":"700 -95", "text":"View Cart"},
-  {"id":5, "loc":"660 100", "text":"Update Cart"},
-  {"id":6, "loc":"850 20", "text":"Checkout"},
-  {"id":-2, "loc":"830 200", "type":"End", "text":"End" }
-  ],
+{"id":-1,"loc":"155 -150","type":"Start","text":"Start"},
+{"id":0,"loc":"21 -17","text":"I am a AI modeler, tell me what is your requirement"},
+{"id":1,"loc":"-177 94","text":"create a new model"},
+{"id":2,"loc":"32 92","text":"enhance an existing model"},
+{"id":3,"loc":"299 92","text":"create a pydantic schema"},
+{"id":4,"loc":"561 92","text":"create a relational schema"},
+{"id":5,"loc":"-390 93","text":"search a model"},
+{"id":-2,"loc":"141 222","type":"End","text":"End"}
+],
   "linkDataArray": [
-    { "from": -1, "to": 0, "progress": true, "text": "Visit online store", "curviness": -10 },
-    { "from": 0, "to": 1,  "progress": true, "text": "Browse" },
-    { "from": 0, "to": 2,  "progress": true, "text": "Use search bar", "curviness": -70 },
-    { "from": 1, "to": 2,  "progress": true, "text": "Use search bar" },
-    { "from": 2, "to": 3,  "progress": true, "text": "Click item", "curviness": -70 },
-    { "from": 2, "to": 2,  "progress": false, "text": "Another search", "curviness": 40 },
-    { "from": 1, "to": 3,  "progress": true, "text": "Click item" },
-    { "from": 3, "to": 0,  "progress": false, "text": "Not interested", "curviness": -100 },
-    { "from": 3, "to": 4,  "progress": true, "text": "Add to cart" },
-    { "from": 4, "to": 0,  "progress": false, "text": "More shopping", "curviness": -150 },
-    { "from": 4, "to": 5,  "progress": false, "text": "Update needed", "curviness": 70 },
-    { "from": 5, "to": 4,  "progress": false, "text": "Update made" },
-    { "from": 4, "to": 6,  "progress": true, "text": "Proceed" },
-    { "from": 6, "to": 5,  "progress": false, "text": "Update needed"},
-    { "from": 6, "to": -2, "progress": true, "text": "Purchase made" }
-  ]
-}
+{"from":-1,"to":0,"progress":false,"text":"prompt","curviness":-10,"points":[186,-79,183,-57,186,-36,193,-17]},
+{"from":2,"to":-2,"points":[158,130,185,150,194,181,182,223]},
+{"from":3,"to":-2,"points":[382,130,332,199,276,235,204,248]},
+{"from":4,"to":-2,"points":[624,130,477,206,345,245,204,252]},
+{"from":0,"to":5,"points":[21,1,-104,1,-198,79,-266,96]},
+{"from":0,"to":1,"points":[128,21,18,49,31,107,-25,110]},
+{"from":0,"to":2,"points":[202,21,203,72,194,90,186,93]},
+{"from":0,"to":4,"points":[382,6,389,6,490,30,621,92]},
+{"from":0,"to":3,"points":[238,21,317,62,339,34,382,92]},
+{"from":1,"to":-2,"points":[-78,132,-17,183,62,221,142,245]},
+{"from":5,"to":-2,"points":[-299,131,-174,213,-33,259,141,254]},
+{"from":2,"to":0,"points":[131,92,126,47,141,23,149,21]},
+{"from":3,"to":0,"points":[299,103,300,103,258,80,215,21]},
+{"from":4,"to":0,"points":[651,92,628,42,473,-49,299,-16]},
+{"from":5,"to":0,"points":[-312,93,-204,-34,-10,-46,121,-16]}
+]}
     </textarea>
   </div>
 </div>

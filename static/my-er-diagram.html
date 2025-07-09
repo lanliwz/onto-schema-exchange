@@ -63,6 +63,7 @@
             <button onclick="save_model_data('/model/er_nodes',nodeDataArray)">Save Node Array</button>
             <h3>Data:</h3>
             <button onclick="refreshDisplay()">Refresh</button>
+          <button onclick="load()">load</button>
 
             <div class="container">
               <div class="column">
@@ -72,6 +73,10 @@
               <div class="column">
                 <h3>linkDataArray</h3>
                 <pre id="linkDataOutput">Loading...</pre>
+              </div>
+              <div class="column">
+                <h3>Data Model</h3>
+                <textarea id="dataModelOutput">Loading...</textarea>
               </div>
             </div>
 
@@ -92,6 +97,8 @@
                   document.getElementById("linkDataOutput").textContent =
                     "linkDataArray not found.";
                 }
+
+                document.getElementById("dataModelOutput").textContent = myDiagram.model.toJson();
               }
               function save_model_data(url,model_data_array) {
                 fetch(url, {
@@ -113,6 +120,9 @@
                 .catch(error => {
                   console.error('Error:', error);
                 })
+                }
+                function load() {
+                  myDiagram.model = go.Model.fromJson(document.getElementById('dataModelOutput').value);
                 }
               // Initial load
               window.addEventListener("DOMContentLoaded", refreshDisplay);

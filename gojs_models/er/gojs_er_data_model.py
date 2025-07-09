@@ -94,13 +94,14 @@ class ModelDataArray(BaseModel):
             for link in self.linkDataArray
         ])
 
-        js_code = f"""nodeDataArray = [
-  {node_array_js}
-];
-
-linkDataArray = [
-  {link_array_js}
-];"""
+        js_code = \
+        f"""nodeDataArray = [
+          {node_array_js}
+        ];
+        
+        linkDataArray = [
+          {link_array_js}
+        ];"""
 
         return js_code
 
