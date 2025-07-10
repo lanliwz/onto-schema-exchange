@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 class GraphLinksModel(BaseModel):
     copiesArrays: bool = True
     copiesArrayObjects: bool = True
+    nodeKeyProperty:str = "key"
     nodeDataArray: List[Dict[str, Any]] = Field(default_factory=list)
     linkDataArray: List[Dict[str, Any]] = Field(default_factory=list)
 
@@ -15,6 +16,7 @@ class GraphLinksModel(BaseModel):
         linkDataArray: List[Dict[str, Any]] = None
     ):
         super().__init__(
+            nodeKeyProperty = "key",
             copiesArrays=copiesArrays,
             copiesArrayObjects=copiesArrayObjects,
             nodeDataArray=nodeDataArray or [],
@@ -24,6 +26,7 @@ class GraphLinksModel(BaseModel):
     def to_javascript(self) -> str:
         return "\n".join([
             "myDiagram.model = new go.GraphLinksModel({",
+            f"  nodeKeyProperty: '{self.nodeKeyProperty}',",
             f"  copiesArrays: {str(self.copiesArrays).lower()},",
             f"  copiesArrayObjects: {str(self.copiesArrayObjects).lower()},",
             f"  nodeDataArray: nodeDataArray,",
