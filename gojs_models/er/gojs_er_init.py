@@ -5,6 +5,7 @@ from gojs_models.er.gogs_er_node_template import NodeTemplate
 from gojs_models.er.gojs_er_item_template import ItemTemplate
 from gojs_models.er.gojs_er_link_template import LinkTemplate
 from gojs_models.er.gojs_er_data_model import *
+from gojs_models.gojs_data_model import GraphLinksModel
 
 
 class ForceDirectedLayout(BaseModel):
@@ -54,21 +55,6 @@ class DiagramConfig(BaseModel):
   'themeManager.currentTheme': {current_theme_js}
 }});"""
 
-class GraphLinksModelConfig(BaseModel):
-    copiesArrays: bool = True
-    copiesArrayObjects: bool = True
-    nodeDataArray: List[Dict[str, Any]] = Field(default_factory=list)
-    linkDataArray: List[Dict[str, Any]] = Field(default_factory=list)
-
-    def to_javascript(self) -> str:
-        return "\n".join([
-            "myDiagram.model = new go.GraphLinksModel({ // return",
-            f"  copiesArrays: {str(self.copiesArrays).lower()}, // return",
-            f"  copiesArrayObjects: {str(self.copiesArrayObjects).lower()}, // return",
-            f"  nodeDataArray: nodeDataArray, // return",
-            f"  linkDataArray: linkDataArray // return",
-            "}); // return"
-        ])
 
 def init():
     themes = DiagramThemes(
@@ -98,7 +84,7 @@ def init():
     item_template = ItemTemplate()
     link_template = LinkTemplate()
     node_template = NodeTemplate()
-    go_links_model = GraphLinksModelConfig()
+    go_links_model = GraphLinksModel()
     config = DiagramConfig(
         layout=ForceDirectedLayout(isInitial=False),
         themeManager_themeMap=[
