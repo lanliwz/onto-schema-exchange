@@ -25,8 +25,9 @@ class LinkTemplate(BaseModel):
     corner: int = 5
     curve: str = 'go.Curve.JumpOver'
     shape: LinkShape = LinkShape()
-    from_label: Optional[TextBlock] = TextBlock(segmentIndex=0, textBinding='text')
+    from_label: Optional[TextBlock] = TextBlock(segmentIndex=1, textBinding='fromText')
     to_label: Optional[TextBlock] = TextBlock(segmentIndex=-1, textBinding='toText')
+    middle_label: Optional[TextBlock] = TextBlock(segmentIndex=2, textBinding='text')
 
     def to_javascript(self, diagram_name: str = 'myDiagram') -> str:
         js = f"""{diagram_name}.linkTemplate = new go.Link({{
@@ -69,6 +70,15 @@ class LinkTemplate(BaseModel):
       segmentOffset: {self.to_label.segmentOffset},
       segmentOrientation: {self.to_label.segmentOrientation}
     }}).bind('text', '{self.to_label.textBinding}')
+      .theme('stroke', 'text'),
+    new go.TextBlock({{
+      textAlign: '{self.middle_label.textAlign}',
+      font: '{self.middle_label.font}',
+      stroke: '{self.middle_label.stroke}',
+      segmentIndex: {self.middle_label.segmentIndex},
+      segmentOffset: {self.middle_label.segmentOffset},
+      segmentOrientation: {self.middle_label.segmentOrientation}
+    }}).bind('text', '{self.middle_label.textBinding}')
       .theme('stroke', 'text')
   );"""
         return js
