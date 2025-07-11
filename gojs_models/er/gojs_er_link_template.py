@@ -27,7 +27,7 @@ class LinkTemplate(BaseModel):
     shape: LinkShape = LinkShape()
     from_label: Optional[TextBlock] = TextBlock(segmentIndex=1, textBinding='fromText')
     to_label: Optional[TextBlock] = TextBlock(segmentIndex=-1, textBinding='toText')
-    middle_label: Optional[TextBlock] = TextBlock(segmentIndex=2, textBinding='text')
+    middle_label: Optional[TextBlock] = TextBlock(segmentIndex=3, textBinding='text')
 
     def to_javascript(self, diagram_name: str = 'myDiagram') -> str:
         js = f"""{diagram_name}.linkTemplate = new go.Link({{
