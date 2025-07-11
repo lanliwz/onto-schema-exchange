@@ -24,9 +24,9 @@ async def get_data():
 
 @router.get("/model/er_model_data.js",response_class=PlainTextResponse)
 def get_er_model():
-    js = product_data_array.to_javascript()
+    js = product_data_array.node_to_javascript() + " " + product_data_array.link_to_javascript()
     model_data=remove_js_format(js)
-    # print(model_data)
+    print(model_data)
     return Response(content=model_data, media_type="application/javascript")
 
 @router.get("/model/er_model_template.js",response_class=PlainTextResponse)

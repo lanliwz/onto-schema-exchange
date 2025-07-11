@@ -6,6 +6,7 @@ from gojs_models.er.gojs_er_item_template import ItemTemplate
 from gojs_models.er.gojs_er_link_template import LinkTemplate
 from gojs_models.er.gojs_er_data_model import *
 from gojs_models.gojs_data_model import GraphLinksModel
+from gojs_models.gojs_er_product import product_data_array
 
 
 class ForceDirectedLayout(BaseModel):
@@ -84,7 +85,8 @@ def init():
     item_template = ItemTemplate()
     link_template = LinkTemplate()
     node_template = NodeTemplate()
-    go_links_model = GraphLinksModel()
+    go_links_model = GraphLinksModel(dataArray=product_data_array)
+    # go_links_model = GraphLinksModel()
     config = DiagramConfig(
         layout=ForceDirectedLayout(isInitial=False),
         themeManager_themeMap=[

@@ -57,10 +57,11 @@ product_data_array = ModelDataArray(
         ),
     ],
     linkDataArray=[
-        Link(from_node='Products', to_node='Suppliers', text='0..N', toText='1'),
-        Link(from_node='Products', to_node='Categories', text='0..N', toText='1'),
-        Link(from_node='Order Details', to_node='Products', text='0..N', toText='1'),
-        Link(from_node='Categories', to_node='Suppliers', text='0..N', toText='1'),
+        Link(from_node='Products', to_node='Suppliers', fromText='0..N', toText='1', text="isSuppliedBy"),
+        Link(from_node='Products', to_node='Categories', fromText='0..N', toText='1',text="isCategorizedBy"),
+        Link(from_node='Order Details', to_node='Products', fromText='0..N', toText='1',text="includes"),
+        Link(from_node='Categories', to_node='Suppliers', fromText='0..N', toText='1',text="lists"),
     ]
 
 )
+# print(product_data_array.to_javascript())

@@ -1,6 +1,8 @@
 from typing import List, Optional
 from pydantic import BaseModel,Field
 
+from gojs_models.gojs_data_model import GoJsBaseModel
+
 
 class NodeItem(BaseModel):
     name: str
@@ -42,7 +44,7 @@ class Node(BaseModel):
     items: List[NodeItem]
     inheritedItems: Optional[List[NodeItem]] = []
 
-    def to_js(self):
+    def to_javascript(self):
         js_node = {
             'key': self.key,
             'location': f"new go.Point({self.location.b}, {self.location.k})",
@@ -60,48 +62,81 @@ class Link(BaseModel):
     to_node: str = Field(..., alias="to")
     text: Optional[str] = ''
     toText: Optional[str] = ''
+    fromText: Optional[str] = ''
     model_config = {
         "populate_by_name": True  # Needed if you're using from_node instead of 'from'
     }
 
-    def to_js(self):
+    def to_javascript(self):
         return {
             'from': self.from_node,
             'to': self.to_node,
             'text': self.text,
+            'fromText': self.fromText,
             'toText': self.toText
         }
 
-class ModelDataArray(BaseModel):
+class ModelDataArray(GoJsBaseModel):
     nodeDataArray: List[Node]
     linkDataArray: List[Link]
+
+    def node_to_javascript(self) -> str:
+        node_array_js = ',\n  '.join([
+            '{\n' +
+            f"    key: '{node.key}',\n" +
+            f"    location: {node.to_javascript()['location']},\n" +
+            f"    items: {node.to_javascript()['items']},\n" +
+            f"    inheritedItems: {node.to_javascript()['inheritedItems']}\n" +
+            '  }'
+            for node in self.nodeDataArray
+        ])
+
+        js_code = \
+            f"""nodeDataArray = [
+                  {node_array_js}
+                ];"""
+        return js_code
+    def link_to_javascript(self) -> str:
+        link_array_js = ',\n  '.join([
+            '{ ' +
+            f"from: '{link.from_node}', to: '{link.to_node}', text: '{link.text}', fromText: '{link.fromText}',toText: '{link.toText}'" +
+            ' }'
+            for link in self.linkDataArray
+        ])
+        js_code = \
+            f"""
+          linkDataArray = [
+            {link_array_js}
+          ];"""
+        return js_code
+
 
     def to_javascript(self) -> str:
         node_array_js = ',\n  '.join([
             '{\n' +
             f"    key: '{node.key}',\n" +
-            f"    location: {node.to_js()['location']},\n" +
-            f"    items: {node.to_js()['items']},\n" +
-            f"    inheritedItems: {node.to_js()['inheritedItems']}\n" +
+            f"    location: {node.to_javascript()['location']},\n" +
+            f"    items: {node.to_javascript()['items']},\n" +
+            f"    inheritedItems: {node.to_javascript()['inheritedItems']}\n" +
             '  }'
             for node in self.nodeDataArray
         ])
 
         link_array_js = ',\n  '.join([
             '{ ' +
-            f"from: '{link.from_node}', to: '{link.to_node}', text: '{link.text}', toText: '{link.toText}'" +
+            f"from: '{link.from_node}', to: '{link.to_node}', text: '{link.text}', fromText: '{link.fromText}',toText: '{link.toText}'" +
             ' }'
             for link in self.linkDataArray
         ])
 
         js_code = \
-        f"""nodeDataArray = [
+        f"""nodeDataArray : [
           {node_array_js}
-        ];
+        ],
         
-        linkDataArray = [
+        linkDataArray : [
           {link_array_js}
-        ];"""
+        ]"""
 
         return js_code
 
