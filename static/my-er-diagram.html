@@ -51,6 +51,33 @@
         </script>
 
         <div id="sample">
+          <h1>WebSocket Stream</h1>
+          <div id="messages"></div>
+          <textarea id="SocketCommand">type the command here</textarea>
+
+          <script>
+            const socket = new WebSocket("ws://localhost:8000/ws");
+
+            socket.onmessage = function(event) {
+<!--              const msg = document.createElement("div");-->
+<!--              msg.textContent = event.data;-->
+<!--              document.getElementById("messages").appendChild(msg);-->
+              myDiagram.model = go.Model.fromJson(event.data);
+
+            };
+
+            socket.onclose = function() {
+              const msg = document.createElement("div");
+              msg.textContent = "Connection closed";
+              document.getElementById("messages").appendChild(msg);
+            };
+
+            function sendMessage() {
+            const input = document.getElementById("SocketCommand");
+            socket.send(input.value);
+            input.value = "";
+            };
+          </script>
           <div id="myDiagramDiv" style="background-color: white; border: solid 1px black; width: 100%; height: 700px"></div>
               <h3>Theme:</h3>
               <select id="theme" onchange="changeTheme()">
@@ -63,8 +90,8 @@
             <button onclick="save_model_data('/model/er_nodes',nodeDataArray)">Save Node Array</button>
             <h3>Data:</h3>
             <button onclick="refreshDisplay()">Refresh</button>
-          <button onclick="load()">load</button>
-
+            <button onclick="load()">load</button>
+            <button onclick="sendMessage()">issue command</button>
             <div class="container">
               <div class="column">
                 <h3>nodeDataArray</h3>
