@@ -43,6 +43,7 @@ def get_text(file_path: str) -> str:
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("WebSocket connected, waiting for file path...")
+    await websocket.send_text("__connected__")
 
     try:
         # Wait for file path with timeout

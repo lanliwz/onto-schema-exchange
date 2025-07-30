@@ -59,6 +59,9 @@
           const socket = new WebSocket("ws://localhost:8000/ws");
 
           socket.onmessage = function(event) {
+            if (event.data === "__connected__") {
+              socket.send("/Users/weizhang/Downloads/model_data.json");
+            }
             if (event.data === "__ping__") {
               socket.send("__pong__");
               return;
