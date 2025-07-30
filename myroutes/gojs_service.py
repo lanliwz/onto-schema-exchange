@@ -2,6 +2,9 @@ from typing import List
 from fastapi import APIRouter, Response, WebSocket
 import asyncio
 import hashlib
+import os
+
+from starlette.websockets import WebSocketDisconnect
 
 from gojs_models.er.gojs_er_data_model import Node,Link
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -26,7 +29,7 @@ def compute_hash(file_path: str) -> str:
     try:
         with open(file_path, "rb") as f:
             return hashlib.md5(f.read()).hexdigest()
-    except FileNotFoundError:
+    except Exception:
         return ""
 
 def get_text(file_path: str) -> str:
@@ -39,26 +42,64 @@ def get_text(file_path: str) -> str:
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("WebSocket connected...")
-
-    file_path = "/Users/weizhang/Downloads/model_data.json"
-    check_interval = 2  # seconds
-    last_hash = ""
+    print("WebSocket connected, waiting for file path...")
 
     try:
+        # Wait for file path with timeout
+        file_path = await asyncio.wait_for(websocket.receive_text(), timeout=300)
+
+        if not os.path.isfile(file_path):
+            await websocket.send_text(f"Invalid file path: {file_path}")
+            return
+
+        print(f"Started watching: {file_path}")
+        last_hash = ""
+
         while True:
-            current_hash = compute_hash(file_path)
-            if current_hash and current_hash != last_hash:
-                print(f"File changed: {last_hash} -> {current_hash}")
-                last_hash = current_hash
-                content = get_text(file_path)
-                await websocket.send_text(content)
-            await asyncio.sleep(check_interval)
+            try:
+                # Send heartbeat ping
+                await websocket.send_text("__ping__")
+                print("__ping__")
+                pong = await asyncio.wait_for(websocket.receive_text(), timeout=10)
+
+                if pong != "__pong__":
+                    print(f"Invalid pong received: {pong}")
+                    break  # or raise Exception("Invalid pong")
+                print("__pong__")
+
+                # Check file change
+                current_hash = compute_hash(file_path)
+                if current_hash and current_hash != last_hash:
+                    print(f"File changed: {last_hash} -> {current_hash}")
+                    last_hash = current_hash
+                    content = get_text(file_path)
+                    await websocket.send_text(content)
+
+                await asyncio.sleep(5)
+
+            except WebSocketDisconnect:
+                print("WebSocket client disconnected.")
+                break
+            except Exception as e:
+                print("WebSocket error during heartbeat or send:", e)
+                break
+
+    except asyncio.TimeoutError:
+        await websocket.send_text("Timeout: No file path received in 5 minutes. Closing connection.")
+    except WebSocketDisconnect:
+        print("WebSocket client disconnected before sending file path.")
     except Exception as e:
-        print("WebSocket connection closed or error:", e)
+        print("WebSocket error before streaming started:", e)
     finally:
-        await websocket.close()
-        print("WebSocket closed.")
+        try:
+            await websocket.close()
+            print("WebSocket closed.")
+        except RuntimeError as e:
+            # This happens if the connection is already closed
+            print("WebSocket already closed:", e)
+        except Exception as e:
+            print("Error while closing WebSocket:", e)
+
 
 
 @router.get("/data", response_class=JSONResponse)

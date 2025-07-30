@@ -53,30 +53,36 @@
         <div id="sample">
           <h1>WebSocket Stream</h1>
           <div id="messages"></div>
-          <textarea id="SocketCommand">type the command here</textarea>
+          <textarea id="SocketCommand">/Users/weizhang/Downloads/model_data.json</textarea>
 
           <script>
-            const socket = new WebSocket("ws://localhost:8000/ws");
+          const socket = new WebSocket("ws://localhost:8000/ws");
 
-            socket.onmessage = function(event) {
-<!--              const msg = document.createElement("div");-->
-<!--              msg.textContent = event.data;-->
-<!--              document.getElementById("messages").appendChild(msg);-->
+          socket.onmessage = function(event) {
+            if (event.data === "__ping__") {
+              socket.send("__pong__");
+              return;
+            }
+
+            // Assume valid JSON GoJS model
+            try {
               myDiagram.model = go.Model.fromJson(event.data);
+            } catch (err) {
+              console.error("Invalid diagram JSON:", err);
+            }
+          };
 
-            };
+          socket.onclose = function() {
+            const msg = document.createElement("div");
+            msg.textContent = "Connection closed";
+            document.getElementById("messages").appendChild(msg);
+          };
 
-            socket.onclose = function() {
-              const msg = document.createElement("div");
-              msg.textContent = "Connection closed";
-              document.getElementById("messages").appendChild(msg);
-            };
-
-            function sendMessage() {
+          function sendMessage() {
             const input = document.getElementById("SocketCommand");
             socket.send(input.value);
             input.value = "";
-            };
+          };
           </script>
           <div id="myDiagramDiv" style="background-color: white; border: solid 1px black; width: 100%; height: 700px"></div>
               <h3>Theme:</h3>
