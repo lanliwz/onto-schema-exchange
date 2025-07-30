@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Response, WebSocket
 import asyncio
+import hashlib
 
 from gojs_models.er.gojs_er_data_model import Node,Link
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -21,33 +22,43 @@ data_store = {"message": "Hello from FastAPI!", "timestamp": "2025-02-23 12:00:0
 
 
 
+def compute_hash(file_path: str) -> str:
+    try:
+        with open(file_path, "rb") as f:
+            return hashlib.md5(f.read()).hexdigest()
+    except FileNotFoundError:
+        return ""
+
+def get_text(file_path: str) -> str:
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception as e:
+        return f"Error reading file: {e}"
+
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("it is connected now ...")
+    print("WebSocket connected...")
+
+    file_path = "/Users/weizhang/Downloads/model_data.json"
+    check_interval = 2  # seconds
+    last_hash = ""
 
     try:
         while True:
-            message = await websocket.receive_text()
-            print(f"Received command: {message}")
-
-            if message.lower() == "end":
-                await websocket.send_text("Connection closed by command.")
-                await websocket.close()
-                break
-            else:
-                # watcher = PrintingFileWatcher("/Users/weizhang/Downloads/model_data.json", check_interval=2)
-                # watcher.start()
-                # print_it("/Users/weizhang/Downloads/model_data.json")
-                msg = get_text("/Users/weizhang/Downloads/model_data.json")
-                await websocket.send_text(msg)
-            response = f"Command '{message}' received and executed."
-            await websocket.send_text(response)
+            current_hash = compute_hash(file_path)
+            if current_hash and current_hash != last_hash:
+                print(f"File changed: {last_hash} -> {current_hash}")
+                last_hash = current_hash
+                content = get_text(file_path)
+                await websocket.send_text(content)
+            await asyncio.sleep(check_interval)
     except Exception as e:
         print("WebSocket connection closed or error:", e)
-
-
-    # await websocket.close()
+    finally:
+        await websocket.close()
+        print("WebSocket closed.")
 
 
 @router.get("/data", response_class=JSONResponse)
