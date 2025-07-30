@@ -67,6 +67,7 @@ npm create gojs-kit@latest
 ## This project provides interactive diagrams for better visualization.
 - [Entity-Relationship Diagram](http://127.0.0.1:8000/static/my-er-diagram.html)
 - [Family Tree Diagram](http://127.0.0.1:8000/static/my-family-tree.html)
+- [Workflow Diagram](http://127.0.0.1:8000/static/my-fsm-designer.html)
 
 Make sure your server is running locally at `http://127.0.0.1:8000` to view them.
 
