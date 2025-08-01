@@ -18,10 +18,34 @@
         <!-- * * * * * * * * * * * * * -->
         <!-- Start of GoJS sample code -->
         <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.15"></script>
-        <!-- MyFastApiInjectCodeStart -->
-        <!-- MyFastApiInjectCodeEnd -->
         <div id="allSampleContent" class="p-4 w-full">
+          <script id="socket">
+            const socket = new WebSocket("ws://localhost:8000/ws");
+            const model_data_file = "/Users/weizhang/Downloads/wf_model_data.json"
 
+            socket.onmessage = function(event) {
+              if (event.data === "__connected__") {
+                socket.send(model_data_file);
+              }
+              if (event.data === "__ping__") {
+                socket.send("__pong__");
+                return;
+              }
+
+              // Assume valid JSON GoJS model
+              try {
+                myDiagram.model = go.Model.fromJson(event.data);
+              } catch (err) {
+                console.error("Invalid diagram JSON:", err);
+              }
+            };
+
+            socket.onclose = function() {
+              const msg = document.createElement("div");
+              msg.textContent = "Connection closed";
+              document.getElementById("messages").appendChild(msg);
+            };
+          </script>
           <script id="code">
   function init() {
     myDiagram = new go.Diagram('myDiagramDiv', {
@@ -221,7 +245,6 @@
   window.addEventListener('DOMContentLoaded', init);
 </script>
 
-          <div id="sample">
   <div id="myDiagramDiv" style="border: solid 1px black; width: 100%; height: 470px; background: whitesmoke"></div>
   <div>
     <div>
@@ -265,7 +288,5 @@
 </div>
         </div>
       </div>
-    </div>
-
   </body>
 </html>

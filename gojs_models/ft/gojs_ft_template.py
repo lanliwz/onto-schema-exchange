@@ -83,6 +83,7 @@ class InitDiagram(BaseModel):
     diagram.scale = 1;
     diagram.commandHandler.scrollToPart(diagram.findNodeForKey('{self.root_key}'));
   }});
+  return diagram;
 }};"""
 
 class TemplateComponents(BaseModel):

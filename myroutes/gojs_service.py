@@ -60,13 +60,13 @@ async def websocket_endpoint(websocket: WebSocket):
             try:
                 # Send heartbeat ping
                 await websocket.send_text("__ping__")
-                print("__ping__")
+                # print("__ping__")
                 pong = await asyncio.wait_for(websocket.receive_text(), timeout=10)
 
                 if pong != "__pong__":
                     print(f"Invalid pong received: {pong}")
                     break  # or raise Exception("Invalid pong")
-                print("__pong__")
+                # print("__pong__")
 
                 # Check file change
                 current_hash = compute_hash(file_path)
@@ -76,7 +76,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     content = get_text(file_path)
                     await websocket.send_text(content)
 
-                await asyncio.sleep(5)
+                await asyncio.sleep(2)
 
             except WebSocketDisconnect:
                 print("WebSocket client disconnected.")

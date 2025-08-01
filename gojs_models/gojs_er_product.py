@@ -64,4 +64,3 @@ product_data_array = ModelDataArray(
     ]
 
 )
-# print(product_data_array.to_javascript())

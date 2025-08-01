@@ -57,10 +57,11 @@
 
           <script>
           const socket = new WebSocket("ws://localhost:8000/ws");
+          const model_data_file = "/Users/weizhang/Downloads/model_data.json"
 
           socket.onmessage = function(event) {
             if (event.data === "__connected__") {
-              socket.send("/Users/weizhang/Downloads/model_data.json");
+              socket.send(model_data_file);
             }
             if (event.data === "__ping__") {
               socket.send("__pong__");
