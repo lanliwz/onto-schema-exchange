@@ -65,18 +65,10 @@
                 };
           </script>
             <script id="code">
-              window.addEventListener('DOMContentLoaded', () => {
-                // setTimeout only to ensure font is loaded before loading diagram
-                // you may want to use an asset loading library for this
-                // to keep this sample simple, it does not
-
-                setTimeout(() => {
-                  myDiagram = initDiagram('myDiagramDiv');
-
-                }, 300);
-              });
-
-
+              function refreshDisplay() {
+                document.getElementById("dataModelOutput").textContent = myDiagram.model.toJson();
+              }
+              window.addEventListener('DOMContentLoaded', init);
             </script>
 
         <div id="sample">

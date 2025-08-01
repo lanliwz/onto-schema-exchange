@@ -1,4 +1,4 @@
-from gojs_models.ft.gojs_ft_init import init
+from gojs_models.ft.gojs_ft_diagram import init_diagram
 
 
-print(init());
+print(init_diagram());

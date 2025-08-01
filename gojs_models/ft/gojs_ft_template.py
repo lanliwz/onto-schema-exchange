@@ -45,13 +45,14 @@ class LinkTemplate(BaseModel):
         .bindObject('strokeWidth', 'isSelected', (selected) => selected ? 2 : 1)
     );"""
 
-class InitDiagram(BaseModel):
+class DiagramConfig(BaseModel):
     root_key: str = 'King George V'  # configurable!
+    diagram_div: str = "myDiagramDiv"
 
     def to_javascript(self) -> str:
-        return f"""const initDiagram = (divId) => {{
-  const diagram = new go.Diagram(divId, {{
-    layout: new go.TreeLayout({{
+        return f"""
+const myDiagram = new go.Diagram('{self.diagram_div}', {{
+      layout: new go.TreeLayout({{
       angle: 90,
       nodeSpacing: 20,
       layerSpacing: 50,
@@ -65,35 +66,33 @@ class InitDiagram(BaseModel):
     'toolManager.hoverDelay': 100,
     linkTemplate: createLinkTemplate(),
     model: new go.TreeModel({{ nodeKeyProperty: 'name' }})
-  }});
+}});
 
-  diagram.nodeTemplate = createNodeTemplate();
-  const nodes = familyData;
-  diagram.model.addNodeDataCollection(nodes);
+myDiagram.nodeTemplate = createNodeTemplate();
+const nodes = familyData;
+myDiagram.model.addNodeDataCollection(nodes);
 
-  diagram.addDiagramListener('InitialLayoutCompleted', () => {{
-    const root = diagram.findNodeForKey('{self.root_key}');
-    if (!root) return;
-    diagram.scale = 0.6;
-    diagram.scrollToRect(root.actualBounds);
-  }});
+myDiagram.addDiagramListener('InitialLayoutCompleted', () => {{
+const root = myDiagram.findNodeForKey('{self.root_key}');
+if (!root) return;
+myDiagram.scale = 0.6;
+myDiagram.scrollToRect(root.actualBounds);
+}});
 
-  document.getElementById('zoomToFit').addEventListener('click', () => diagram.commandHandler.zoomToFit());
-  document.getElementById('centerRoot').addEventListener('click', () => {{
-    diagram.scale = 1;
-    diagram.commandHandler.scrollToPart(diagram.findNodeForKey('{self.root_key}'));
-  }});
-  return diagram;
-}};"""
+document.getElementById('zoomToFit').addEventListener('click', () => diagram.commandHandler.zoomToFit());
+document.getElementById('centerRoot').addEventListener('click', () => {{
+myDiagram.scale = 1;
+myDiagram.commandHandler.scrollToPart(diagram.findNodeForKey('{self.root_key}'));
+}});"""
 
 class TemplateComponents(BaseModel):
     create_node_template: NodeTemplate = NodeTemplate()
     create_link_template: LinkTemplate = LinkTemplate()
-    init_diagram: InitDiagram = InitDiagram()
+    configuration: DiagramConfig = DiagramConfig()
 
     def to_javascript(self) -> str:
         return '\n\n'.join([
             self.create_node_template.to_javascript(),
             self.create_link_template.to_javascript(),
-            self.init_diagram.to_javascript()
+            self.configuration.to_javascript()
         ])

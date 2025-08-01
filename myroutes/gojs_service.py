@@ -9,8 +9,8 @@ from starlette.websockets import WebSocketDisconnect
 from gojs_models.er.gojs_er_data_model import Node,Link
 from fastapi.responses import JSONResponse, PlainTextResponse
 
-from gojs_models.er.gojs_er_init import init as er_init
-from gojs_models.ft.gojs_ft_init import init as ft_init
+from gojs_models.er.gojs_er_diagram import init_diagram as er_init
+from gojs_models.ft.gojs_ft_diagram import init_diagram as ft_init
 from js_util import *
 
 from gojs_models.gojs_er_product import product_data_array

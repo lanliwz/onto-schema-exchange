@@ -57,7 +57,7 @@ class DiagramConfig(BaseModel):
 }});"""
 
 
-def init():
+def init_diagram():
     themes = DiagramThemes(
         themes=[
             Theme(

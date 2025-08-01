@@ -1,4 +1,4 @@
-from gojs_models.er.gojs_er_init import *
+from gojs_models.er.gojs_er_diagram import *
 
 product_data_array = ModelDataArray(
     nodeDataArray=[

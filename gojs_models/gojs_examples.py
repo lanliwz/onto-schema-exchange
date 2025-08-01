@@ -1,6 +1,6 @@
 
 
-from gojs_models.er.gojs_er_init import *
+from gojs_models.er.gojs_er_diagram import *
 
 
-print(init())
+print(init_diagram())
