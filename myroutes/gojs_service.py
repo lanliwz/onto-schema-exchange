@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 from gojs_models.er.gojs_er_diagram import init_diagram as er_init
 from gojs_models.ft.gojs_ft_diagram import init_diagram as ft_init
+from gojs_models.wf.gojs_wf_diagram import init_diagram as wf_init
 from js_util import *
 
 from gojs_models.gojs_er_product import product_data_array
@@ -123,9 +124,14 @@ def get_er_template():
     return Response(content=js_template, media_type="application/javascript")
 
 @router.get("/model/ft_model_template.js",response_class=PlainTextResponse)
-def get_er_template():
+def get_ft_template():
     js_template = ft_init()
-    # js_template = remove_js_format(js)
+    # print(js_template)
+    return Response(content=js_template, media_type="application/javascript")
+
+@router.get("/model/wf_model_template.js",response_class=PlainTextResponse)
+def get_wf_template():
+    js_template = wf_init()
     print(js_template)
     return Response(content=js_template, media_type="application/javascript")
 
@@ -143,5 +149,5 @@ def save_er_model_node(nodes: List[Node]):
 
 
 @router.post(path="/model/er_links",response_class=JSONResponse)
-def save_er_model_node(links: List[Link]):
+def save_er_model_link(links: List[Link]):
     return {"received": links, "count": len(links)}

@@ -21,18 +21,20 @@ socket.onmessage = function(event) {
         console.error("Invalid diagram JSON:", err);
         }
 };
+socket.onclose = function() {
+    console.log("Connection closed");
+};
     """
 
 def init_diagram():
-
     handlers = PartEventHandlers()
     templates = TemplateComponents()
     person_shapes = PersonShapeComponents()
-    return ("function init_diagram() {" + '\n'
-    + handlers.to_javascript() + '\n'
-    + person_shapes.to_javascript() + '\n'
-    + templates.to_javascript() + '\n'
-    + stream_data_js() + '\n'
-    + "};"
-    )
+
+    return f"""function init_diagram() {{
+{handlers.to_javascript()}
+{person_shapes.to_javascript()}
+{templates.to_javascript()}
+{stream_data_js()}
+}};"""
 
