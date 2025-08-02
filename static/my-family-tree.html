@@ -51,7 +51,9 @@
 
                   // Assume valid JSON GoJS model
                   try {
-                    myDiagram.model = go.Model.fromJson(event.data);
+                  //document.getElementById("dataModelOutput").textContent = go.Model.fromJson(event.data);
+                  console.log(go.Model.fromJson(event.data));
+                  //myDiagram.model = go.Model.fromJson(event.data);
 
                   } catch (err) {
                     console.error("Invalid diagram JSON:", err);
@@ -65,9 +67,7 @@
                 };
           </script>
             <script id="code">
-              function refreshDisplay() {
-                document.getElementById("dataModelOutput").textContent = myDiagram.model.toJson();
-              }
+
               window.addEventListener('DOMContentLoaded', init);
             </script>
 
