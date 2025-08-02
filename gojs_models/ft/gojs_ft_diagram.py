@@ -28,7 +28,7 @@ def init_diagram():
     handlers = PartEventHandlers()
     templates = TemplateComponents()
     person_shapes = PersonShapeComponents()
-    return ("function init() {" + '\n'
+    return ("function init_diagram() {" + '\n'
     + handlers.to_javascript() + '\n'
     + person_shapes.to_javascript() + '\n'
     + templates.to_javascript() + '\n'

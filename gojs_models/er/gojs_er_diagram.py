@@ -95,7 +95,7 @@ def init_diagram():
         ],
         themeManager_changesDivBackground=True
     )
-    return ("function init() {" + '\n'
+    return ("function init_diagram() {" + '\n'
             + config.to_javascript() + '\n'
             + themes.to_javascript() + '\n'
             + item_template.to_javascript() + '\n'
