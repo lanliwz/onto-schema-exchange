@@ -35,42 +35,10 @@
 
         <link href="https://fonts.googleapis.com/css?family=Poppins:regular,medium,bold&subset=latin,latin-ext" rel="stylesheet"
           type="text/css">
-            <script id="socket">
-                const socket = new WebSocket("ws://localhost:8000/ws");
-                const model_data_file = "/Users/weizhang/Downloads/ft_model_data.json"
 
-                socket.onmessage = function(event) {
-
-                  if (event.data === "__connected__") {
-                    socket.send(model_data_file);
-                  }
-                  if (event.data === "__ping__") {
-                    socket.send("__pong__");
-                    return;
-                  }
-
-                  // Assume valid JSON GoJS model
-                  try {
-                  //document.getElementById("dataModelOutput").textContent = go.Model.fromJson(event.data);
-                  console.log(go.Model.fromJson(event.data));
-                  //myDiagram.model = go.Model.fromJson(event.data);
-
-                  } catch (err) {
-                    console.error("Invalid diagram JSON:", err);
-                  }
-                };
-
-                socket.onclose = function() {
-                  const msg = document.createElement("div");
-                  msg.textContent = "Connection closed";
-                  document.getElementById("messages").appendChild(msg);
-                };
-          </script>
             <script id="code">
-
               window.addEventListener('DOMContentLoaded', init);
             </script>
-
         <div id="sample">
           <div id="myDiagramDiv" style="background-color: white; border: solid 1px black; width: 100%; height: 550px"></div>
           <p><button id="zoomToFit">Zoom to Fit</button> <button id="centerRoot">Center on root</button></p>
