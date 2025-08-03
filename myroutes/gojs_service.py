@@ -24,7 +24,24 @@ router = APIRouter()
 
 data_store = {"message": "Hello from FastAPI!", "timestamp": "2025-02-23 12:00:00"}
 
+# WebSocket manager
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
 
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, sender: WebSocket, message: str):
+        for connection in self.active_connections:
+            if connection != sender:
+                await connection.send_text(message)
+
+manager = ConnectionManager()
 
 def compute_hash(file_path: str) -> str:
     try:
@@ -39,6 +56,16 @@ def get_text(file_path: str) -> str:
             return f.read()
     except Exception as e:
         return f"Error reading file: {e}"
+
+@router.websocket("/ws_broadcast")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.broadcast(websocket, data)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -132,7 +159,7 @@ def get_ft_template():
 @router.get("/model/wf_model_template.js",response_class=PlainTextResponse)
 def get_wf_template():
     js_template = wf_init()
-    print(js_template)
+    # print(js_template)
     return Response(content=js_template, media_type="application/javascript")
 
 @router.get("/model/ft_model_data.js",response_class=PlainTextResponse)
