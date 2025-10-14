@@ -43,3 +43,6 @@ app.include_router(mytest.router)
 from myroutes import gojs_service
 app.include_router(gojs_service.router)
 
+# routes
+from myroutes import ent_data_websocket
+app.include_router(ent_data_websocket.router)

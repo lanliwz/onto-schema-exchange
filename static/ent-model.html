@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entitlement Policy Graph – GoJS + WebSocket</title>
+  <script src="https://unpkg.com/gojs/release/go.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .wrap { display: grid; grid-template-columns: 320px 1fr; height: 100%; }
+    aside { padding: 16px; border-right: 1px solid #e5e7eb; background: #fafafa; }
+    main { display: grid; grid-template-rows: 56px 1fr; }
+    header { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; background: #ffffff; display:flex; align-items:center; gap:12px; }
+    #diagramDiv { width: 100%; height: calc(100vh - 56px); }
+    .legend { font-size: 14px; line-height: 1.35; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; margin: 2px 0; }
+    .u { background: #e0f2fe; }
+    .g { background: #e5e7eb; }
+    .p { background: #fef9c3; }
+    .c { background: #dcfce7; }
+    .t { background: #fee2e2; }
+    .s { background: #ede9fe; }
+    code { background: #f6f8fa; padding: 2px 6px; border-radius: 6px; }
+    .note { font-size: 12px; color: #6b7280; }
+    .btn { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 10px; background: white; cursor: pointer; }
+    .status { margin-left: auto; font-size: 12px; padding: 4px 8px; border-radius: 999px; border:1px solid #e5e7eb; }
+    .ok { background:#ecfeff; }
+    .warn { background:#fff7ed; }
+    .err { background:#fee2e2; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside>
+      <h2>Legend</h2>
+      <div class="legend">
+        <div><span class="pill u">User</span> <span class="pill g">PolicyGroup</span> <span class="pill p">Policy</span></div>
+        <div><span class="pill c">Column</span> <span class="pill t">Table</span> <span class="pill s">Schema</span></div>
+        <p style="margin-top:8px;">
+          Relationships:
+          <br/><code>memberOf</code>, <code>includesPolicy</code>, <code>hasColumnRule</code>, <code>hasRowRule</code>, <code>belongsToTable</code>, <code>belongsToSchema</code>
+        </p>
+        <p class="note">Data now streams from WebSocket at ws://localhost:8080/ws.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+          <button class="btn" onclick="layout('LayeredDigraph')">Layered</button>
+          <button class="btn" onclick="layout('ForceDirected')">Force</button>
+          <button class="btn" onclick="layout('Circular')">Circular</button>
+          <button class="btn" onclick="fit()">Fit</button>
+          <button class="btn" onclick="requestFull()">Request Full</button>
+          <button class="btn" onclick="reconnect()">Reconnect</button>
+        </div>
+      </div>
+    </aside>
+    <main>
+      <header>
+        <strong>Entitlement Policy Graph – Demo</strong>
+        <span id="wsStatus" class="status warn">connecting…</span>
+      </header>
+      <div id="diagramDiv"></div>
+    </main>
+  </div>
+
+  <script>
+  // --- GoJS setup
+  const $ = go.GraphObject.make;
+  const diagram = $(go.Diagram, "diagramDiv", {
+    initialAutoScale: go.Diagram.Uniform,
+    layout: $(go.LayeredDigraphLayout, { direction: 0, layerSpacing: 60 }),
+    "undoManager.isEnabled": true
+  });
+
+  // Colors by type
+  const fillByType = {
+    User: "#bae6fd",
+    PolicyGroup: "#e5e7eb",
+    Policy: "#fef9c3",
+    Column: "#bbf7d0",
+    Table: "#fecaca",
+    Schema: "#ddd6fe"
+  };
+
+  diagram.nodeTemplate = $(go.Node, "Auto",
+    { locationSpot: go.Spot.Center },
+    $(go.Shape, "RoundedRectangle",
+      { stroke: "#111827", strokeWidth: 1.2, portId: "", fromLinkable: true, toLinkable: true, cursor: "pointer" },
+      new go.Binding("fill", "type", t => fillByType[t] || "#fff")),
+    $(go.Panel, "Table", { margin: 8 },
+      $(go.TextBlock,
+        { row: 0, font: "bold 13px Inter, ui-sans-serif", stroke: "#111827" },
+        new go.Binding("text", "label")),
+      $(go.TextBlock,
+        { row: 1, margin: new go.Margin(6, 0, 0, 0), font: "12px Inter, ui-sans-serif", stroke: "#374151" },
+        new go.Binding("text", "subtitle"))
+    )
+  );
+
+  diagram.linkTemplate = $(go.Link,
+    { routing: go.Link.AvoidsNodes, corner: 6, toShortLength: 2 },
+    $(go.Shape, { stroke: "#9ca3af", strokeWidth: 1.2 }),
+    $(go.Shape, { toArrow: "Standard", stroke: "#9ca3af", fill: "#9ca3af" }),
+    $(go.Panel, "Auto",
+      $(go.Shape, "RoundedRectangle", { fill: "#fff", stroke: "#e5e7eb" }),
+      $(go.TextBlock, { margin: 3, font: "11px Inter, ui-sans-serif", stroke: "#111827" }, new go.Binding("text", "label"))
+    )
+  );
+
+  // Model
+  const model = new go.GraphLinksModel();
+  model.linkKeyProperty = "key"; // enable link identity if server sends keys
+  diagram.model = model;
+
+  // Utility to (re)layout and fit
+  window.layout = function(kind) {
+    if (kind === 'ForceDirected') diagram.layout = $(go.ForceDirectedLayout, { defaultSpringLength: 60, defaultElectricalCharge: 100 });
+    else if (kind === 'Circular') diagram.layout = $(go.CircularLayout, { spacing: 50 });
+    else diagram.layout = $(go.LayeredDigraphLayout, { direction: 0, layerSpacing: 60 });
+    diagram.layoutDiagram(true);
+  }
+  window.fit = function() { diagram.zoomToFit(); }
+
+  // --- WebSocket wiring
+  const WS_URL = "ws://localhost:8000/ws-ent-model"; // note: websockets use ws:// or wss://
+  const model_data_file = "/Users/weizhang/Downloads/entitlement-model_data.json"
+  const statusEl = document.getElementById("wsStatus");
+  let ws = null;
+  let reconnectAttempts = 0;
+  let pingTimer = null;
+
+  function setStatus(text, cls) {
+    statusEl.textContent = text;
+    statusEl.className = "status " + cls;
+  }
+
+  function connect() {
+    try {
+      ws = new WebSocket(WS_URL);
+    } catch (e) {
+      setStatus("failed to open socket", "err");
+      scheduleReconnect();
+      return;
+    }
+
+    setStatus("connecting…", "warn");
+
+    ws.addEventListener("open", () => {
+      reconnectAttempts = 0;
+      setStatus("connected", "ok");
+      // ask server for current full graph (optional, server may also push without prompt)
+      safeSend({ type: "hello", want: "full_graph" });
+      // heartbeat
+      if (pingTimer) clearInterval(pingTimer);
+      pingTimer = setInterval(() => safeSend({ type: "ping", t: Date.now() }), 15000);
+    });
+
+    ws.addEventListener("message", (evt) => {
+      let msg;
+      try { msg = JSON.parse(evt.data); }
+      catch { console.warn("Non-JSON message", evt.data); return; }
+      handleMessage(msg);
+    });
+
+    ws.addEventListener("close", () => {
+      setStatus("disconnected", "err");
+      if (pingTimer) { clearInterval(pingTimer); pingTimer = null; }
+      scheduleReconnect();
+    });
+
+    ws.addEventListener("error", () => {
+      setStatus("socket error", "err");
+      // let close event handle reconnection
+    });
+  }
+
+  function scheduleReconnect() {
+    reconnectAttempts++;
+    const backoff = Math.min(30000, 1000 * Math.pow(2, reconnectAttempts)); // 1s,2s,4s… max 30s
+    setStatus(`reconnecting in ${Math.round(backoff/1000)}s…`, "warn");
+    setTimeout(() => connect(), backoff);
+  }
+
+  function safeSend(obj) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(obj));
+    }
+  }
+
+  // Public helpers
+  window.requestFull = function() { safeSend({ type: "request_full" }); }
+  window.reconnect = function() {
+    try { if (ws) ws.close(1000, "client-reconnect"); } catch {}
+    // close will trigger scheduleReconnect
+  }
+
+  // --- Message handling
+  function handleMessage(msg) {
+    // Expected shapes:
+    // 1) Full graph replace:
+    // { type: "full_graph", nodes: [...], links: [...] }
+    //
+    // Node shape: { key, type, label, subtitle, ... }
+    // Link shape: { key?, from, to, label, ... }
+    //
+    // 2) Incremental ops (any subset can appear in one message):
+    // { type: "ops",
+    //   addNodes: [...], addLinks: [...],
+    //   updateNodes: [{key, ...patch}], updateLinks: [{key, ...patch}],
+    //   removeNodes: ["key1", ...], removeLinks: ["lk1", ...] }
+    //
+    // 3) Optional: { type: "layout", kind: "ForceDirected"|"LayeredDigraph"|"Circular" }
+    // 4) Optional: { type: "ping" } or { type: "info", message: "..." }
+
+    switch (msg.type) {
+      case "full_graph":
+        replaceGraph(msg.nodes || [], msg.links || []);
+        break;
+      case "ops":
+        applyOps(msg);
+        break;
+      case "layout":
+        window.layout(msg.kind || "LayeredDigraph");
+        break;
+      case "info":
+        setStatus(msg.message || "info", "ok");
+        break;
+      case "ping":
+        // reply to server if needed
+        safeSend({ type: "pong", t: Date.now() });
+        break;
+      default:
+        // if server just sends {nodeDataArray, linkDataArray} (legacy)
+        if (msg.nodeDataArray || msg.linkDataArray) {
+          replaceGraph(msg.nodeDataArray || [], msg.linkDataArray || []);
+        } else {
+          console.warn("Unknown message", msg);
+        }
+    }
+  }
+
+  function replaceGraph(nodes, links) {
+    diagram.model.commit(m => {
+      m.nodeDataArray = [];
+      m.linkDataArray = [];
+      // ensure unique keys
+      nodes.forEach(n => m.addNodeData(n));
+      links.forEach((l, idx) => {
+        if (l.key == null) l.key = `lk_${idx}_${l.from}_${l.to}_${l.label||""}`;
+        m.addLinkData(l);
+      });
+    }, "replace graph");
+    diagram.layoutDiagram(true);
+    diagram.zoomToFit();
+  }
+
+  function applyOps(ops) {
+    diagram.model.commit(m => {
+      (ops.addNodes || []).forEach(n => m.addNodeData(n));
+      (ops.addLinks || []).forEach((l, idx) => {
+        if (l.key == null) l.key = `lk_${cryptoRandomId()}`;
+        m.addLinkData(l);
+      });
+
+      (ops.updateNodes || []).forEach(patch => {
+        const nd = m.findNodeDataForKey(patch.key);
+        if (nd) Object.keys(patch).forEach(k => { if (k !== "key") nd[k] = patch[k]; });
+      });
+
+      (ops.updateLinks || []).forEach(patch => {
+        if (!diagram.model.linkKeyProperty) return; // need a key to update link
+        const all = m.linkDataArray || [];
+        const ld = all.find(x => x.key === patch.key);
+        if (ld) Object.keys(patch).forEach(k => { if (k !== "key") ld[k] = patch[k]; });
+      });
+
+      (ops.removeNodes || []).forEach(key => {
+        const nd = m.findNodeDataForKey(key);
+        if (nd) m.removeNodeData(nd);
+      });
+
+      (ops.removeLinks || []).forEach(key => {
+        const all = m.linkDataArray || [];
+        const ld = all.find(x => x.key === key);
+        if (ld) m.removeLinkData(ld);
+      });
+    }, "apply ops");
+  }
+
+  function cryptoRandomId() {
+    if (crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "id_" + Math.random().toString(36).slice(2, 9);
+  }
+
+  // Kick things off
+  connect();
+
+  </script>
+</body>
+</html>
