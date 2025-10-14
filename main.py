@@ -4,8 +4,27 @@ load_dotenv()
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from myroutes.graph_ws import router, periodic_refresh_task
+import asyncio
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: launch the Neo4j poller
+    task = asyncio.create_task(periodic_refresh_task(interval_sec=10))
+    print("🚀 Started periodic Neo4j refresh task.")
+    yield
+    # Shutdown: cancel the poller
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        print("🛑 Poller stopped gracefully.")
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(router)
+
+app = FastAPI(lifespan=lifespan)
 
 # Configure CORS settings
 app.add_middleware(
@@ -44,5 +63,10 @@ from myroutes import gojs_service
 app.include_router(gojs_service.router)
 
 # routes
-from myroutes import ent_data_websocket
-app.include_router(ent_data_websocket.router)
+# from myroutes import ent_data_websocket
+# app.include_router(ent_data_websocket.router)
+
+# routes
+from myroutes import graph_ws
+app.include_router(graph_ws.router)
+
