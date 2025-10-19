@@ -101,6 +101,8 @@ def _fetch_graph_from_neo4j() -> dict:
         nodes = []
         for rec in node_records:
             key: str = rec["key"]
+
+
             labels: list[str] = rec["labels"] or []
             props: Dict[str, Any] = dict(rec["props"]) if rec["props"] else {}
             # We prefer the "primary" label that matches the types we expect
@@ -156,6 +158,10 @@ async def websocket_endpoint(websocket: WebSocket):
     print("✅ WS client connected:", websocket.client)
 
     # On connect: send full graph from Neo4j
+    # graph = {"nodes": [...], "links": [...]}
+    # {"type": "full_graph", **graph}
+    # The **graph syntax unpacks the contents of another dictionary called graph into this one.
+    # {"type": "full_graph", "nodes": [...], "links": [...]}
     try:
         graph = _fetch_graph_from_neo4j()
         await websocket.send_json({"type": "full_graph", **graph})

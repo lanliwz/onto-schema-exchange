@@ -48,6 +48,8 @@
           <button class="btn" onclick="fit()">Fit</button>
           <button class="btn" onclick="requestFull()">Request Full</button>
           <button class="btn" onclick="reconnect()">Reconnect</button>
+          <button class="btn" onclick="toggleSubtitles()">Toggle Subtitles</button>
+          <button class="btn" onclick="showAll()">Show All</button>
         </div>
       </div>
     </aside>
@@ -93,6 +95,27 @@
         new go.Binding("text", "subtitle"))
     )
   );
+
+  // Selection adornment template for inline menu
+  diagram.nodeTemplate.selectionAdornmentTemplate =
+    $(go.Adornment, "Spot",
+      $(go.Panel, "Auto",
+        $(go.Shape, { fill: null, stroke: "#3b82f6", strokeWidth: 2 }),
+        $(go.Placeholder)
+      ),
+      $(go.Panel, "Horizontal",
+        {
+          alignment: go.Spot.Top,
+          alignmentFocus: go.Spot.Bottom,
+          margin: 0,
+          background: "white"
+        },
+        $("Button",
+          { click: (e, btn) => showNeighbors(btn.part.adornedPart) },
+          $(go.TextBlock, { margin: 4, font: "12px Inter, ui-sans-serif" }, "Neighbors Only")
+        )
+      )
+    );
 
   diagram.linkTemplate = $(go.Link,
     { routing: go.Link.AvoidsNodes, corner: 6, toShortLength: 2 },
@@ -288,6 +311,71 @@
     if (crypto && crypto.randomUUID) return crypto.randomUUID();
     return "id_" + Math.random().toString(36).slice(2, 9);
   }
+
+  // Global flag for subtitles visibility
+  window.showSubtitles = true;
+
+  window.toggleSubtitles = function() {
+    window.showSubtitles = !window.showSubtitles;
+    diagram.startTransaction("toggle subtitles");
+    diagram.nodes.each(node => {
+      const panel = node.findObject("TABLE");
+      // The panel is unnamed, so instead find the TextBlock at row 1:
+      // Or get the second TextBlock in the node
+      const textblocks = [];
+      node.elements.each(e => {
+        if (e instanceof go.Panel) {
+          e.elements.each(el => {
+            if (el instanceof go.TextBlock) textblocks.push(el);
+          });
+        }
+      });
+      let subtitleTB = null;
+      if (textblocks.length >= 2) subtitleTB = textblocks[1];
+      if (!subtitleTB) {
+        // fallback: find the TextBlock with row=1
+        subtitleTB = node.findObject((obj) => obj instanceof go.TextBlock && obj.row === 1);
+      }
+      if (subtitleTB) {
+        subtitleTB.visible = window.showSubtitles;
+      }
+    });
+    diagram.commitTransaction("toggle subtitles");
+  };
+
+  // Show only selected node and its neighbors (1-hop)
+  window.showNeighbors = function(adornedPart) {
+    const node = adornedPart instanceof go.Part ? adornedPart : null;
+    if (!node) return;
+    const keepNodes = new Set();
+    const keepLinks = new Set();
+    keepNodes.add(node.data.key);
+    diagram.links.each(l => {
+      if (l.fromNode === node || l.toNode === node) {
+        keepLinks.add(l);
+        if (l.fromNode) keepNodes.add(l.fromNode.data.key);
+        if (l.toNode) keepNodes.add(l.toNode.data.key);
+      }
+    });
+    diagram.startTransaction("neighbors only");
+    diagram.nodes.each(n => {
+      n.visible = keepNodes.has(n.data.key);
+    });
+    diagram.links.each(l => {
+      l.visible = keepLinks.has(l);
+    });
+    diagram.commitTransaction("neighbors only");
+    diagram.zoomToFit();
+  };
+
+  // Show all nodes and links
+  window.showAll = function() {
+    diagram.startTransaction("show all");
+    diagram.nodes.each(n => n.visible = true);
+    diagram.links.each(l => l.visible = true);
+    diagram.commitTransaction("show all");
+    diagram.zoomToFit();
+  };
 
   // Kick things off
   connect();

@@ -7,7 +7,9 @@ pip install "fastapi[all]"
 pip install "uvicorn[standard]"
 ```
 ### Run it
-```uvicorn main:app --reload```
+```shell
+uvicorn main:app --reload
+```
 
 ### Home setting
 in main.py
@@ -68,6 +70,7 @@ npm create gojs-kit@latest
 - [Entity-Relationship Diagram](http://127.0.0.1:8000/static/my-er-diagram.html)
 - [Family Tree Diagram](http://127.0.0.1:8000/static/my-family-tree.html)
 - [Workflow Diagram](http://127.0.0.1:8000/static/my-fsm-designer.html)
+- [Entitlement Schema](http://127.0.0.1:8000/static/ent-model.html)
 
 Make sure your server is running locally at `http://127.0.0.1:8000` to view them.
 
