@@ -115,6 +115,18 @@
         $("Button",
           { click: (e, btn) => showNeighbors(btn.part.adornedPart) },
           $(go.TextBlock, { margin: 4, font: "12px Inter, ui-sans-serif" }, "Neighbors Only")
+        ),
+        $("Button",
+          { click: (e, btn) => addLinkFromUser(btn.part.adornedPart) },
+          $(go.TextBlock, { margin: 4, font: "12px Inter, ui-sans-serif" }, "Add Link")
+        ),
+        $("Button",
+          { click: (e, btn) => removeLinkFromUser(btn.part.adornedPart) },
+          $(go.TextBlock, { margin: 4, font: "12px Inter, ui-sans-serif" }, "Remove Link")
+        ),
+        $("Button",
+          { click: (e, btn) => showNodeKey(btn.part.adornedPart) },
+          $(go.TextBlock, { margin: 4, font: "12px Inter, ui-sans-serif" }, "Show Key")
         )
       )
     );
@@ -368,6 +380,104 @@
     });
     diagram.commitTransaction("neighbors only");
     diagram.zoomToFit();
+  };
+
+  // Add a link starting from a selected User node
+  window.addLinkFromUser = function(adornedPart) {
+    const node = adornedPart instanceof go.Part ? adornedPart : null;
+    if (!node) return;
+    const nd = node.data || {};
+    if (nd.type !== "User") {
+      alert("Add Link is only available for User nodes.");
+      return;
+    }
+    const fromKey = nd.key;
+    const toKey = prompt("Enter the target node key to link TO (exact key):");
+    if (!toKey) return;
+    const label = prompt("Optional: relationship label (e.g., memberOf):", "memberOf") || "";
+
+    // Validate the target exists
+    const targetNodeData = diagram.model.findNodeDataForKey(toKey);
+    if (!targetNodeData) {
+      alert(`No node found with key: ${toKey}`);
+      return;
+    }
+
+    // Add to model
+    diagram.model.commit(m => {
+      const link = { key: cryptoRandomId(), from: fromKey, to: toKey, label: label };
+      m.addLinkData(link);
+    }, "add link from user");
+
+    // Notify server (best-effort)
+    try { safeSend({ type: "ops", addLinks: [{ from: fromKey, to: toKey, label }] }); } catch {}
+  };
+
+  // Remove a link that starts from the selected User node
+  window.removeLinkFromUser = function(adornedPart) {
+    const node = adornedPart instanceof go.Part ? adornedPart : null;
+    if (!node) return;
+    const nd = node.data || {};
+    if (nd.type !== "User") {
+      alert("Remove Link is only available for User nodes.");
+      return;
+    }
+    const fromKey = nd.key;
+
+    // Let the user choose which link to remove
+    // First, gather outgoing links from this User
+    const outgoing = [];
+    diagram.links.each(l => {
+      if (l.fromNode && l.fromNode.data && l.fromNode.data.key === fromKey) {
+        outgoing.push({ key: l.data.key, to: l.toNode && l.toNode.data ? l.toNode.data.key : l.data.to, label: l.data.label || "" });
+      }
+    });
+
+    if (outgoing.length === 0) {
+      alert("No outgoing links from this User to remove.");
+      return;
+    }
+
+    // Build a simple selector prompt
+    const options = outgoing.map((o, idx) => `${idx + 1}) key=${o.key} to=${o.to} label=${o.label}`).join("\n");
+    const choiceStr = prompt(`Select a link to remove by number:\n${options}`);
+    if (!choiceStr) return;
+    const idx = parseInt(choiceStr, 10) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= outgoing.length) {
+      alert("Invalid selection.");
+      return;
+    }
+
+    const chosen = outgoing[idx];
+
+    // Remove from model
+    diagram.model.commit(m => {
+      const all = m.linkDataArray || [];
+      const ld = all.find(x => x.key === chosen.key);
+      if (ld) m.removeLinkData(ld);
+    }, "remove link from user");
+
+    // Notify server (best-effort)
+    try { safeSend({ type: "ops", removeLinks: [chosen.key] }); } catch {}
+  };
+
+  // Show the selected node's key (and copy to clipboard if possible)
+  window.showNodeKey = function(adornedPart) {
+    const node = adornedPart instanceof go.Part ? adornedPart : null;
+    if (!node) return;
+    const nd = node.data || {};
+    const key = (nd && (nd.key ?? nd.id)) || "(no key)";
+    const msg = `key=${key}\nlabel=${nd.label || ""}\ntype=${nd.type || ""}`;
+    try {
+      if (key && typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(String(key));
+        alert(msg + "\n\n(copied to clipboard)");
+      } else {
+        alert(msg);
+      }
+    } catch (e) {
+      alert(msg);
+    }
   };
 
   // Show all nodes and links
